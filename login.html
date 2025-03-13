@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acropolis LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-3xl p-6 bg-white shadow-lg rounded-lg">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Acropolis Library Management System</h1>
+        
+        <!-- Login Section -->
+        
+        <div class="mb-6 p-4 border rounded-lg bg-gray-50">
+    <h2 class="text-xl font-semibold text-gray-700 mb-2">Member Login</h2>
+    <input type="text" id="username" placeholder="Username" 
+        class="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <input type="password" id="password" placeholder="Password" 
+        class="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    
+    <label for="role" class="block text-gray-700 font-medium mb-1">Select Role:</label>
+    <select id="role" class="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="admin">Admin</option>
+        <option value="librarian">Librarian</option>
+        <option value="libraryassistant">Library Assistant</option>
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
+    </select>
+
+    <button onclick="loginUser()" 
+        class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Login</button>
+
+    <a href="#" class="block text-blue-500 text-sm mt-2 hover:underline">Forgot Password?</a>
+
+    <p id="loginMessage" class="text-red-500 mt-2"></p>
+</div>
+
+        <div class="flex space-x-2 mb-4">
+            <input type="text" id="searchInput" placeholder="Search for books..." 
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="searchBooks()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Search</button>
+        </div>
+        <div id="results" class="space-y-3 mb-6"></div>
+        
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Available Books</h2>
+        <div id="bookList" class="space-y-3">
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <h2 class='text-lg font-semibold'>Introduction to AI</h2>
+                <p class='text-gray-600'>John Doe</p>
+                <button onclick="viewBook('Introduction to AI', 'John Doe', 'An introductory book on Artificial Intelligence.')" 
+                    class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">View Book</button>
+            </div>
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <h2 class='text-lg font-semibold'>Machine Learning Basics</h2>
+                <p class='text-gray-600'>Jane Smith</p>
+                <button onclick="viewBook('Machine Learning Basics', 'Jane Smith', 'A beginner guide to machine learning concepts.')" 
+                    class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">View Book</button>
+            </div>
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <h2 class='text-lg font-semibold'>Web Development Guide</h2>
+                <p class='text-gray-600'>Alice Johnson</p>
+                <button onclick="viewBook('Web Development Guide', 'Alice Johnson', 'Comprehensive guide on web technologies.')" 
+                    class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600">View Book</button>
+            </div>
+        </div>
+        
+        <div id="bookDetails" class="mt-6 p-4 border rounded-lg bg-gray-50 hidden">
+            <h2 class="text-xl font-semibold" id="bookTitle"></h2>
+            <p class="text-gray-600" id="bookAuthor"></p>
+            <p class="mt-2 text-gray-700" id="bookDescription"></p>
+        </div>
+    </div>
+    
+    <script>
+        function loginUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const loginMessage = document.getElementById('loginMessage');
+            
+            /*if (username === "admin" && password === "password" && role === "admin") {
+                loginMessage.innerHTML = "<span class='text-green-500'>Admin login successful!</span>";
+            } else if (username === "user" && password === "password" && role === "member") {
+                loginMessage.innerHTML = "<span class='text-green-500'>Member login successful!</span>";
+            } else {
+                loginMessage.innerHTML = "Invalid credentials or role. Try again.";
+            }*/
+
+	    if (role === "admin") {
+                window.location.href = "admin-librarian dashboard.html";
+            } else {
+                window.location.href = "user dashboard.html";
+            }
+        }
+        
+        function searchBooks() {
+            const query = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = "";
+            
+            if (!query) {
+                resultsDiv.innerHTML = "<p class='text-red-500'>Please enter a search term.</p>";
+                return;
+            }
+            
+            const books = [
+                { title: "Introduction to AI", author: "John Doe", description: "An introductory book on Artificial Intelligence." },
+                { title: "Machine Learning Basics", author: "Jane Smith", description: "A beginner guide to machine learning concepts." },
+                { title: "Web Development Guide", author: "Alice Johnson", description: "Comprehensive guide on web technologies." }
+            ];
+            
+            const filteredBooks = books.filter(book => 
+                book.title.toLowerCase().includes(query.toLowerCase()) ||
+                book.author.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (filteredBooks.length === 0) {
+                resultsDiv.innerHTML = "<p class='text-gray-600'>No books found.</p>";
+                return;
+            }
+            
+            filteredBooks.forEach(book => {
+                resultsDiv.innerHTML += `<div class='p-4 border rounded-lg bg-gray-50'>
+                    <h2 class='text-lg font-semibold'>${book.title}</h2>
+                    <p class='text-gray-600'>${book.author}</p>
+                </div>`;
+            });
+        }
+        
+        function viewBook(title, author, description) {
+            document.getElementById('bookTitle').innerText = title;
+            document.getElementById('bookAuthor').innerText = `Author: ${author}`;
+            document.getElementById('bookDescription').innerText = description;
+            document.getElementById('bookDetails').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

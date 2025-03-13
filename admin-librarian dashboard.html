@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin & Librarian Dashboard</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar ul li:hover {
+            background: #34495e;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .btn {
+            margin: 10px 5px;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .search-container {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 600px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 2px;
+        }
+
+        .form-input,
+        .searchable-dropdown,
+        .action-button {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .action-button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body onload="showSection('titlebooks')">
+    <div class="sidebar">
+        <h2>Library Dashboard</h2>
+        <ul>
+            <li onclick="showSection('profile')">🧑Profile</li>
+            <li onclick="showSection('titlebooks')">📚 Manage Books</li>
+            <li onclick="showSection('bookcirculation')">📚🔄 Book Circulation</li>
+            <li onclick="showSection('approvalpanel')">📚✅ Title/Book Approval</li>
+            <li onclick="showSection('reports')">📚📊 View Reports</li>
+            <li onclick="showSection('rules')">📜✅ Circulation Rules</li>
+            <li onclick="showSection('users')">👨‍👩‍👧‍👦✅ Manage Users</li>
+        </ul>
+    </div>
+    <div class="content">
+        <div id="titlebooks" class="section">
+            <h2>📚 Manage Titles and Books</h2>
+            <button class="btn" onclick="showSubSection('titles')">Show Titles</button>
+            <button class="btn" onclick="showSubSection('books')">Show Books</button>
+
+            <div id="books" class="sub-section" style="display:none;">
+                <button class="btn" onclick="window.location.href='add_book_form.html'">Add Book/Item</button>
+                <button class="btn" onclick="window.location.href='edit_book_form.html'">Edit Book/Item</button>
+                <button class="btn">Delete Book/Item</button>
+
+                <!-- Search & Filter Section -->
+                <div class="card p-4 mt-3">
+                    <h5>🔹 Search & Filter</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control"
+                                placeholder="Search by Title, Author, ISBN, Category">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Filter by Availability</option>
+                                <option>Available</option>
+                                <option>Issued</option>
+                                <option>Reserved</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Sort by</option>
+                                <option>Title</option>
+                                <option>Cetegory</option>
+                                <option>Author Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Publisher</th>
+                            <th>Edition</th>
+                            <th>Accession Number</th>
+                            <th>Available</th>
+                            <th>Reference</th>
+                            <th>Discarded</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="titles" class="sub-section" style="display:none;">
+                <button class="btn" onclick="window.location.href='add_title_form.html'">Add Title</button>
+                <button class="btn" onclick="window.location.href='edit_title_form.html'">Edit Title</button>
+                <button class="btn">Delete Title</button>
+
+                <!-- Search & Filter Section -->
+                <div class="card p-4 mt-3">
+                    <h5>🔹 Search & Filter</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control"
+                                placeholder="Search by Title, Author, ISBN, Category">
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Sort by</option>
+                                <option>Publication Date</option>
+                                <option>Category</option>
+                                <option>Author Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Title ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th>Publisher</th>
+                            <th>Edition</th>
+                            <th>Publication Year</th>
+                            <th>Category</th>
+                            <th>Total Quantity</th>
+                            <th>Available Quantity</th>
+                            <th>Discarded Quantity</th>
+
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div id="users" class="section">
+            <h2>👥 Manage Users</h2>
+            <button class="btn" onclick="window.location.href='add_user_form.html'">Add User</button>
+            <button class="btn" onclick="window.location.href='add_user_form.html'">Edit User</button>
+            <button class="btn">Delete User</button>
+            <button class="btn">Reset Password</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox"></th>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="reports" class="section">
+            <h2>📊 View Reports</h2>
+            <button class="btn" onclick="showSubSection('issuedbooks')">Issued Books</button>
+            <button class="btn" onclick="showSubSection('reserveddbooks')">Reservations</button>
+
+            <div id="issuedbooks" class="sub-section" style="display:none;">
+                <h2 class="text-center mb-4">Issued Books List</h2>
+
+                <div class="mb-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Book Title or User"
+                        onkeyup="searchTable()">
+                </div>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Accession Number</th>
+                            <th>Book Title</th>
+                            <th>User ID</th>
+                            <th>Issued Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issuedBooksTable">
+                        <tr>
+                            <td>101</td>
+                            <td>The Great Gatsby</td>
+                            <td>U001</td>
+                            <td>2025-03-01</td>
+                            <td>2025-03-15</td>
+                            <td class="text-danger">Overdue</td>
+                        </tr>
+                        <tr>
+                            <td>102</td>
+                            <td>To Kill a Mockingbird</td>
+                            <td>U002</td>
+                            <td>2025-03-05</td>
+                            <td>2025-03-19</td>
+                            <td class="text-success">On Time</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="reserveddbooks" class="sub-section" style="display:none;">
+                <h2 class="text-center mb-4">Reserved Books List</h2>
+
+                <div class="mb-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Book Title or User"
+                        onkeyup="searchTable()">
+                </div>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Accession Number</th>
+                            <th>Book Title</th>
+                            <th>User ID</th>
+                            <th>Reservation Date</th>
+                            <th>Pickup Deadline</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservedBooksTable">
+                        <tr>
+                            <td>201</td>
+                            <td>The Catcher in the Rye</td>
+                            <td>U010</td>
+                            <td>2025-03-08</td>
+                            <td>2025-03-15</td>
+                            <td class="text-warning">Pending Pickup</td>
+                        </tr>
+                        <tr>
+                            <td>202</td>
+                            <td>1984</td>
+                            <td>U015</td>
+                            <td>2025-03-10</td>
+                            <td>2025-03-17</td>
+                            <td class="text-success">Reserved</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="rules" class="section">
+            <h2>⚖ Manage Circulation Rules</h2>
+            <button class="btn" onclick="window.location.href='add_cir_rule_form.html'">Add Rule</button>
+            <button class="btn" onclick="window.location.href='add_cir_rule_form.html'">Edit Rule</button>
+            <button class="btn">Delete Rule</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox"></th>
+                        <th>Rule ID</th>
+                        <th>Description</th>
+                        <th>Max Days</th>
+                        <th>Max Books</th>
+                        <th>Renewal</th>
+                        <th>Fine per Day</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="bookcirculation" class="section container">
+            <h2 class="title">📚 Book Circulation - Librarian Panel</h2>
+
+            <div class="form-group">
+                <label for="accessionNumber">Select Accession Number:</label>
+                <select id="accessionNumber" class="searchable-dropdown">
+                    <option value="">Select Book</option>
+                    <option value="101" data-title="The Great Gatsby">101 - The Great Gatsby</option>
+                    <option value="102" data-title="1984">102 - 1984</option>
+                    <option value="103" data-title="Moby Dick">103 - Moby Dick</option>
+                </select>
+                <p id="bookTitle" class="book-title"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="userId">Select User ID:</label>
+                <select id="userId" class="searchable-dropdown">
+                    <option value="">Select User</option>
+                    <option value="U001">U001 - John Doe</option>
+                    <option value="U002">U002 - Jane Smith</option>
+                    <option value="U003">U003 - Alex Brown</option>
+                </select>
+            </div>
+
+            <button class="action-button" onclick="issueBook()">Issue Book</button>
+
+            <div class="form-group">
+                <label for="returnAccessionNumber">Select Accession Number:</label>
+                <select id="returnAccessionNumber" class="searchable-dropdown">
+                    <option value="101">101 - The Great Gatsby</option>
+                    <option value="102">102 - 1984</option>
+                    <option value="103">103 - Moby Dick</option>
+                </select>
+            </div>
+            <button class="action-button" onclick="returnBook()">Return Book</button>
+
+            <div class="form-group">
+                <label for="renewAccessionNumber">Select Accession Number:</label>
+                <select id="renewAccessionNumber" class="searchable-dropdown">
+                    <option value="101">101 - The Great Gatsby</option>
+                    <option value="102">102 - 1984</option>
+                    <option value="103">103 - Moby Dick</option>
+                </select>
+            </div>
+            <button class="action-button" onclick="renewBook()">Renew Book</button>
+
+            <div class="form-group">
+                <label for="overdueUserId">Select User ID:</label>
+                <select id="overdueUserId" class="searchable-dropdown">
+                    <option value="U001">U001 - John Doe</option>
+                    <option value="U002">U002 - Jane Smith</option>
+                    <option value="U003">U003 - Alex Brown</option>
+                </select>
+            </div>
+            <button class="action-button" onclick="showSection('collectfine')">Check Fines</button>
+        </div>
+
+        <div id="approvalpanel" class="section">
+            <h2>📚✅ Approve Titles and Books</h2>
+            <button class="btn" onclick="showSubSection('approvetitles')">Show Titles for Approval</button>
+            <button class="btn" onclick="showSubSection('approvebooks')">Show Books for Approval</button>
+
+            <div id="approvebooks" class="sub-section" style="display:none;">
+                <button class="btn">Approve Book/Item</button>
+                <button class="btn">Reject Book/Item</button>
+
+                <!-- Search & Filter Section -->
+                <div class="card p-4 mt-3">
+                    <h5>🔹 Search & Filter</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control"
+                                placeholder="Search by Title, Author, ISBN, Category">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Filter by Availability</option>
+                                <option>Available</option>
+                                <option>Issued</option>
+                                <option>Reserved</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Sort by</option>
+                                <option>Title</option>
+                                <option>Cetegory</option>
+                                <option>Author Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Action type</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Publisher</th>
+                            <th>Accession No.(Existing)</th>
+                            <th>Accession No.(New)</th>
+                            <th>Available(Existing)</th>
+                            <th>Available(New)</th>
+                            <th>Reference(Existing)</th>
+                            <th>Reference(New)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="approvetitles" class="sub-section" style="display:none;">
+                <button class="btn">Approve Title</button>
+                <button class="btn">Reject Title</button>
+                <button class="btn" onclick="window.location.href='titlecoparision.html'">Compare with Existing</button>
+
+                <!-- Search & Filter Section -->
+                <div class="card p-4 mt-3">
+                    <h5>🔹 Search & Filter</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control"
+                                placeholder="Search by Title, Author, ISBN, Category">
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-control">
+                                <option>Sort by</option>
+                                <option>Publication Date</option>
+                                <option>Category</option>
+                                <option>Author Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Action Type</th>
+                            <th>Title ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                            <th>Publisher</th>
+                            <th>Edition</th>
+                            <th>Publication Year</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div id="profile" class="section" style="margin-left: 260px; padding: 20px; flex: 1;">
+            <div
+                style="max-width: 500px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); text-align: center;">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;"><i class="fas fa-user-circle"></i> User Profile</h2>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-user"></i>
+                        Username:</label>
+                    <input type="text" value="johndoe" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-id-badge"></i>
+                        Full Name:</label>
+                    <input type="text" value="John Doe" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-envelope"></i>
+                        Email:</label>
+                    <input type="email" value="johndoe@example.com" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <label
+                    style="font-weight: bold; text-align:left;  color: #34495e; display: block; flex: 1; flex-direction: row;"><i
+                        class="fas fa-phone"></i> Mobile:</label>
+                <div class="form-group"
+                    style="margin-bottom: 15px; text-align: left; display: flex; flex-direction: row;align-items: left;">
+                    <input type="text" id="mobile" value="1234567890" readonly
+                        style=" width:70%; flex-direction: row; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                    <button id="editBtn" onclick="enableEdit()"
+                        style="width:30%; padding: 10px; background: #f39c12; color: white; border: none; cursor: pointer; border-radius: 6px;"
+                        onmouseover="this.style.background='#e67e22'" onmouseout="this.style.background='#f39c12'"><i
+                            class="fas fa-edit"></i> Edit</button>
+                </div>
+                <button id="saveBtn" onclick="saveMobile()"
+                    style="display: none; padding: 12px; background: #28a745; color: white; border: none; cursor: pointer; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 600;">Save</button>
+                <button class="btn" onclick="changePassword()"
+                    style="display: inline-block; padding: 12px; background: #3498db; color: white; border: none; cursor: pointer; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 600; margin-top: 20px;">Change
+                    Password</button>
+            </div>
+        </div>
+
+        <div id="collectfine" class="section">
+            <div class="container mt-4">
+                <h2 class="text-center">💰 Collect Fine</h2>
+
+                <div class="card p-4 mt-3">
+                    <p><strong>Name:</strong> John Doe</p>
+                    <p><strong>User ID:</strong> LMS12345</p>
+                </div>
+
+                <div class="card p-4 mt-3">
+                    <h4>Outstanding Fines</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Due Date</th>
+                                <th>Fine Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Introduction to Algorithms</td>
+                                <td>2025-02-20</td>
+                                <td>$5.00</td>
+                            </tr>
+                            <tr>
+                                <td>Database Management Systems</td>
+                                <td>2025-02-25</td>
+                                <td>$10.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Total Fine:</strong> $15.00</p>
+                </div>
+                <div class="card p-4 mt-3">
+                    <h4>Payment Options</h4>
+                    <label for="paymentMethod">Select Payment Method:</label>
+                    <select class="form-control" id="paymentMethod">
+                        <option>Collect Cash</option>
+                        <option>Generate QR</option>
+                    </select>
+                    <button class="btn btn-success btn-custom mt-3"><i class="fas fa-money-bill-wave"></i> Fine
+                        Collected</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function showSection(sectionId) {
+                document.querySelectorAll('.section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+            }
+
+            function showSubSection(subSectionId) {
+                document.querySelectorAll('.sub-section').forEach(subSection => {
+                    subSection.style.display = 'none';
+                });
+                document.getElementById(subSectionId).style.display = 'block';
+            }
+
+            function enableEdit() {
+                document.getElementById("mobile").removeAttribute("readonly");
+                document.getElementById("mobile").style.backgroundColor = "#fff";
+                document.getElementById("editBtn").style.display = "none";
+                document.getElementById("saveBtn").style.display = "block";
+            }
+
+            function saveMobile() {
+                document.getElementById("mobile").setAttribute("readonly", true);
+                document.getElementById("mobile").style.backgroundColor = "#f8f9fa";
+                document.getElementById("editBtn").style.display = "block";
+                document.getElementById("saveBtn").style.display = "none";
+                alert("Mobile number updated successfully!");
+            }
+
+            function changePassword() {
+                let newPassword = prompt("Enter your new password:");
+                if (newPassword) {
+                    alert("Password changed successfully!");
+                }
+            }
+        </script>
+</body>
+
+</html>

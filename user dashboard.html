@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar ul li:hover {
+            background: #34495e;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .btn {
+            margin: 10px 5px;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 2px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .due-soon {
+            background-color: #ffeb3b;
+        }
+
+        .overdue {
+            background-color: #ff5252;
+            color: white;
+        }
+
+        .search-container {
+            margin-bottom: 10px;
+        }
+
+        .btn-custom {
+            width: 200px;
+        }
+
+        .renew-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .renew-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body onload="initpage()">
+    <div class="sidebar">
+        <h2>Library User Dashboard</h2>
+        <ul>
+            <li onclick="showSection('profile')">🧑Profile</li>
+            <li onclick="showSection('borrowedbooks')">📚✅<br>View Borrowed Book<br>& Due Dates</li>
+            <li onclick="showSection('booksearch')">📚🔍<br>Search & Reserve Books</li>
+            <li onclick="showSection('reservedbooks')">📚View Reserved Books</li>
+            <li onclick="showSection('payfine')">📚💰<br>Pay Fines</li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div id="booksearch" class="section">
+            <h2 class="text-center">📚 Search & Reserve Books</h2>
+
+            <!-- Search & Filter Section -->
+            <div class="card p-4 mt-3">
+                <h5>🔹 Search & Filter</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Search by Title, Author, ISBN, Category">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control">
+                            <option>Filter by Availability</option>
+                            <option>Available</option>
+                            <option>Issued</option>
+                            <option>Reserved</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control">
+                            <option>Sort by</option>
+                            <option>Publication Date</option>
+                            <option>Popularity</option>
+                            <option>Author Name</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book List Section -->
+            <div class="mt-4">
+                <h5>📌 Book List</h5>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h6>Book Title 1</h6>
+                        <p>Author: Author Name | ISBN: 123456789 | Available: 5 copies</p>
+                        <a href="book-details.html" class="btn btn-success">View Details</a>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>Book Title 2</h6>
+                        <p>Author: Author Name | ISBN: 987654321 | Available: 2 copies</p>
+                        <a href="book-details.html" class="btn btn-success">View Details</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="borrowedbooks" class="section">
+            <h2 class="text-center">Borrowed Books & Due Dates</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Borrowed Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="book-list">
+                    <!-- Book data will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="payfine" class="section">
+            <div class="container mt-4">
+                <h2 class="text-center">💰 Fine Payment</h2>
+
+                <div class="card p-4 mt-3">
+                    <p><strong>Name:</strong> John Doe</p>
+                    <p><strong>User ID:</strong> LMS12345</p>
+                </div>
+
+                <div class="card p-4 mt-3">
+                    <h4>Outstanding Fines</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Due Date</th>
+                                <th>Fine Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Introduction to Algorithms</td>
+                                <td>2025-02-20</td>
+                                <td>$5.00</td>
+                            </tr>
+                            <tr>
+                                <td>Database Management Systems</td>
+                                <td>2025-02-25</td>
+                                <td>$10.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Total Fine:</strong> $15.00</p>
+                </div>
+
+                <div class="card p-4 mt-3">
+                    <h4>Payment Options</h4>
+                    <label for="paymentMethod">Select Payment Method:</label>
+                    <select class="form-control" id="paymentMethod">
+                        <option>Credit Card</option>
+                        <option>Debit Card</option>
+                        <option>PayPal</option>
+                        <option>Bank Transfer</option>
+                    </select>
+                    <button class="btn btn-success btn-custom mt-3"><i class="fas fa-money-bill-wave"></i> Pay
+                        Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile" class="section" style="margin-left: 260px; padding: 20px; flex: 1;">
+            <div
+                style="max-width: 500px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); text-align: center;">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;"><i class="fas fa-user-circle"></i> User Profile</h2>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-user"></i>
+                        Username:</label>
+                    <input type="text" value="johndoe" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-id-badge"></i>
+                        Full Name:</label>
+                    <input type="text" value="John Doe" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="font-weight: bold; color: #34495e; display: block;"><i class="fas fa-envelope"></i>
+                        Email:</label>
+                    <input type="email" value="johndoe@example.com" readonly
+                        style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                </div>
+                <label
+                    style="font-weight: bold; text-align:left;  color: #34495e; display: block; flex: 1; flex-direction: row;"><i
+                        class="fas fa-phone"></i> Mobile:</label>
+                <div class="form-group"
+                    style="margin-bottom: 15px; text-align: left; display: flex; flex-direction: row;align-items: left;">
+                    <input type="text" id="mobile" value="1234567890" readonly
+                        style=" width:70%; flex-direction: row; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background-color: #f8f9fa; font-size: 14px; color: #333;">
+                    <button id="editBtn" onclick="enableEdit()"
+                        style="width:30%; padding: 10px; background: #f39c12; color: white; border: none; cursor: pointer; border-radius: 6px;"
+                        onmouseover="this.style.background='#e67e22'" onmouseout="this.style.background='#f39c12'"><i
+                            class="fas fa-edit"></i> Edit</button>
+                </div>
+                <button id="saveBtn" onclick="saveMobile()"
+                    style="display: none; padding: 12px; background: #28a745; color: white; border: none; cursor: pointer; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 600;">Save</button>
+                <button class="btn" onclick="changePassword()"
+                    style="display: inline-block; padding: 12px; background: #3498db; color: white; border: none; cursor: pointer; width: 100%; border-radius: 6px; font-size: 16px; font-weight: 600; margin-top: 20px;">Change
+                    Password</button>
+            </div>
+        </div>
+
+        <div id="reservedbooks" class="section">
+            <h2 class="text-center">Reserved Books</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Borrowed Date</th>
+                        <th>Request Date</th>
+                        <th>Status</th>
+                        <th>Expire Date</th>
+                    </tr>
+                </thead>
+                <tbody id="res-list">
+                    <!-- Book data will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+            function showSection(sectionId) {
+                document.querySelectorAll('.section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+                //if( sectionId === 'borrowedbooks') loadBooks();
+            }
+
+            function showSubSection(subSectionId) {
+                document.querySelectorAll('.sub-section').forEach(subSection => {
+                    subSection.style.display = 'none';
+                });
+                document.getElementById(subSectionId).style.display = 'block';
+            }
+
+            const books = [
+                { title: "The Great Gatsby", author: "F. Scott Fitzgerald", borrowedDate: "2025-03-02", dueDate: "2025-03-15" },
+                { title: "1984", author: "George Orwell", borrowedDate: "2024-02-20", dueDate: "2024-03-05" },
+                { title: "To Kill a Mockingbird", author: "Harper Lee", borrowedDate: "2024-02-25", dueDate: "2024-02-28" }
+            ];
+
+
+            function checkDueStatus(dueDate) {
+                const today = new Date();
+                const due = new Date(dueDate);
+                const diffTime = (due - today) / (1000 * 60 * 60 * 24);
+
+                if (diffTime < 0) return 'overdue';
+                if (diffTime <= 3) return 'due-soon';
+                return '';
+            }
+
+            function loadBooks() {
+                const bookList = document.getElementById("book-list");
+                books.forEach(book => {
+                    const row = document.createElement("tr");
+                    const statusClass = checkDueStatus(book.dueDate);
+
+                    row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.borrowedDate}</td>
+                    <td>${book.dueDate}</td>
+                    <td class="${statusClass}">${statusClass.replace('-', ' ') || 'On Time'}</td>
+		<td><button class="renew-btn" onclick="renewBook('${book.title}')">Renew</button></td>
+                `;
+                    bookList.appendChild(row);
+                });
+            }
+
+            function initpage() {
+                loadBooks();
+                showSection('borrowedbooks');
+            }
+
+            function enableEdit() {
+                document.getElementById("mobile").removeAttribute("readonly");
+                document.getElementById("mobile").style.backgroundColor = "#fff";
+                document.getElementById("editBtn").style.display = "none";
+                document.getElementById("saveBtn").style.display = "block";
+            }
+
+            function saveMobile() {
+                document.getElementById("mobile").setAttribute("readonly", true);
+                document.getElementById("mobile").style.backgroundColor = "#f8f9fa";
+                document.getElementById("editBtn").style.display = "block";
+                document.getElementById("saveBtn").style.display = "none";
+                alert("Mobile number updated successfully!");
+            }
+
+            function changePassword() {
+                let newPassword = prompt("Enter your new password:");
+                if (newPassword) {
+                    alert("Password changed successfully!");
+                }
+            }
+        </script>
+</body>
+
+</html>
